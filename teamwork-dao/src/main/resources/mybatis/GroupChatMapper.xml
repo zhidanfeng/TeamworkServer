@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamwork.dao.GroupChatDao">
+    <select id="getHistoryMessage" resultType="com.teamwork.entity.T_GROUPCHAT_MSG"
+            parameterType="java.lang.String">
+        select msg_id, msg_content, msg_time, user_id, project_id
+        from t_groupchat_msg
+        where project_id = #{projectId}
+    </select>
+    <select id="getHistoryMessage2" resultType="com.teamwork.entity.T_GROUPCHAT_MSG"
+            parameterType="com.teamwork.vo.condition.GroupChatMsgFilterCondition">
+        select msg_id, msg_content, msg_time, user_id, project_id
+        from t_groupchat_msg
+        where project_id = #{projectId} and msg_time between #{startTime} and #{endTime}
+    </select>
+    
+</mapper>

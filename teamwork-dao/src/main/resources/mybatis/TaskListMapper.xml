@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamwork.dao.TaskListDao">
+    <select id="getSeq" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select MAX(seq) from t_task_list where group_id = #{groupId}
+    </select>
+
+    <select id="getTaskListList" resultMap="taskListResultMap" parameterType="java.lang.String">
+        select t1.id, t1.group_id, t1.list_name, t1.seq, t1.can_delete, t2.id as taskId, t2.project_id, t2.task_name, t2.priority_id
+        from t_task_list t1 left join t_task t2
+        on t1.id = t2.list_id
+        where t1.group_id = #{groupId}
+    </select>
+    
+    <resultMap id="taskListResultMap" type="com.teamwork.vo.TaskListVO">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="list_name" property="listName" />
+        <result column="seq" property="seq" />
+        <result column="can_delete" property="canDelete" />
+        <collection property="taskList" ofType="com.teamwork.vo.TaskVO">
+            <id column="taskId" property="taskId" />
+            <result column="project_id" property="projectId" />
+            <result column="task_name" property="taskName" />
+            <result column="priority_id" property="priorityId" />
+        </collection>
+    </resultMap>
+</mapper>

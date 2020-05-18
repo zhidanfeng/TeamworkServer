@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamwork.dao.TaskDao">
+    <select id="getAllByCondition" resultType="com.teamwork.vo.TaskVO" parameterType="com.teamwork.vo.condition.TaskFilterCondition">
+        select id as taskId, task_name as taskName, create_time as createTime, update_time as updateTime
+        from t_task where project_id = #{projectId}
+        <if test="taskName != null">
+            and task_name like CONCAT('%','${taskName}','%' )
+        </if>
+        <choose>
+            <when test="startTime != null and endTime != null">
+                and create_time between #{startTimeDt} and #{endTimeDt}
+            </when>
+            <when test="startTime != null and endTime == null">
+                and create_time between #{startTimeDt} and DATE_ADD(#{startTimeDt}, INTERVAL 24 HOUR)
+            </when>
+        </choose>
+        limit 0, 100
+    </select>
+</mapper>
