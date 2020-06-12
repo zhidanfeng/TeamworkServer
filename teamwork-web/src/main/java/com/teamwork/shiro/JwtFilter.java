@@ -2,7 +2,7 @@ package com.teamwork.shiro;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.teamwork.consts.ShiroConsts;
-import com.teamwork.token.JwtToken;
+import com.teamwork.JwtToken;
 import com.teamwork.utils.JsonUtil;
 import com.teamwork.utils.JwtUtil;
 import com.teamwork.vo.Result;

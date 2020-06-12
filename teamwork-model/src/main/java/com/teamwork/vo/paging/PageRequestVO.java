@@ -17,11 +17,15 @@ public class PageRequestVO {
     /**
      * 当前页记录最大id
      */
-    private int maxRowId;
+    private Long maxRowId;
     /**
      * 当前页记录最小id
      */
-    private int minRowId;
+    private Long minRowId;
+    /**
+     * 相对于当前页的偏移页码，比如当前页是第5页，那么下一页是1，上一页是-1，下二页是2，上二页是-2
+     */
+    private int offsetPage;
 
     public PageRequestVO(int pageNum, int pageSize) {
         this.currentPage = pageNum;

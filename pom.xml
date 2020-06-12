@@ -6,8 +6,10 @@
     <modules>
         <module>teamwork-common</module>
         <module>teamwork-model</module>
-        <module>teamwork-service</module>
-        <module>teamwork-dao</module>
+        <module>teamwork-service-api</module>
+        <module>teamwork-services</module>
+        <module>teamwork-entity</module>
+        <module>teamwork-config-server</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -23,6 +25,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
     </properties>
 
     <dependencies>
@@ -56,17 +59,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.9.7</version>
+            <version>2.10.4</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.7</version>
+            <version>2.10.4</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.9.7</version>
+            <version>2.10.4</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -129,6 +132,11 @@
                 <version>0.0.1-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>com.teamwork</groupId>
+                <artifactId>teamwork-entity</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>8.0.12</version>
@@ -143,7 +151,7 @@
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
-                <version>1.2.13</version>
+                <version>1.2.12</version>
             </dependency>
             <!--Druid连接池-->
             <dependency>
@@ -191,6 +199,13 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>3.12.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
