@@ -1,31 +1,20 @@
 package com.teamwork.vo;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 
-public class Result implements Serializable {
+public class Result<T> implements Serializable {
+    @Getter
+    @Setter
     private int code;
+    @Getter
+    @Setter
     private String msg;
-    private Object data;
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public Object getData() {
-        return data;
-    }
+    @Getter
+    @Setter
+    private T data;
 
     public Result() {}
 
@@ -69,9 +58,5 @@ public class Result implements Serializable {
     private void setResultCode(ResultCode resultCode) {
         this.code = resultCode.code();
         this.msg = resultCode.message();
-    }
-
-    private void setData(Object data) {
-        this.data = data;
     }
 }

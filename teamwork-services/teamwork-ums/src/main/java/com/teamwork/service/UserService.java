@@ -11,4 +11,8 @@ public interface UserService extends BaseService<UserInfo> {
      * 登录
      */
     Result userLogin(LoginVO vo, HttpServletResponse response);
+    /**
+     * 获取用户信息
+     */
+    Result getUserInfo(long userId);
 }

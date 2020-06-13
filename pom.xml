@@ -10,6 +10,7 @@
         <module>teamwork-services</module>
         <module>teamwork-entity</module>
         <module>teamwork-config-server</module>
+        <module>teamwork-gateway-api</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

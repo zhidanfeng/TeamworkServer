@@ -1,3 +1,28 @@
+#
+#server:
+#  port: 8189
+#spring:
+#  application:
+#    name: gateway-service
+#  cloud:
+#    gateway:
+#      discovery:
+#        locator:
+#          enabled: false
+#          lower-case-service-id: true
+#      routes:
+#        - id: gateway-service
+#          uri: lb://EURKA-CLIENT
+#          predicates:
+#            - Path=/api-a/**
+#          filters:
+#            - StripPrefix=1
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8181/eureka/
+
+
 server:
   port: 8189
 spring:
@@ -10,10 +35,34 @@ spring:
           enabled: false
           lower-case-service-id: true
       routes:
-        - id: gateway-service
+        - id: general-route
+          uri: lb://API-GENERAL
+          predicates:
+            - Path=/api-general/**
+          filters:
+            - StripPrefix=1
+        - id: ums-route
           uri: lb://API-UMS
           predicates:
             - Path=/api-ums/**
+          filters:
+            - StripPrefix=1
+        - id: project-route
+          uri: lb://API-PROJECT
+          predicates:
+            - Path=/api-project/**
+          filters:
+            - StripPrefix=1
+        - id: task-route
+          uri: lb://API-TASK
+          predicates:
+            - Path=/api-task/**
+          filters:
+            - StripPrefix=1
+        - id: groupchat-route
+          uri: lb://API-GROUPCHAT
+          predicates:
+            - Path=/api-groupchat/**
           filters:
             - StripPrefix=1
 eureka:

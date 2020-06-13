@@ -8,7 +8,7 @@
         where project_id = #{projectId}
     </select>
     <select id="getHistoryMessage2" resultType="com.teamwork.entity.T_GROUPCHAT_MSG"
-            parameterType="com.teamwork.vo.condition.GroupChatMsgFilterCondition">
+            parameterType="com.teamwork.vo.GroupChatMsgFilterCondition">
         select msg_id, msg_content, msg_time, user_id, project_id
         from t_groupchat_msg
         where project_id = #{projectId} and msg_time between #{startTime} and #{endTime}

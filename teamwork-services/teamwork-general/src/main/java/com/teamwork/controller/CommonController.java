@@ -3,10 +3,7 @@ package com.teamwork.controller;
 import com.teamwork.service.CommonService;
 import com.teamwork.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CommonController {
@@ -19,9 +16,9 @@ public class CommonController {
      */
     @CrossOrigin(origins="*", maxAge=3600)
     @ResponseBody
-    @GetMapping(value = "/viewid")
-    public Result getViewId() {
-        String result = commonService.getViewId();
+    @GetMapping(value = "/viewid/{viewId}")
+    public Result getViewId(@PathVariable String viewId) {
+        String result = commonService.getViewId(viewId);
         return "".equals(result) ? Result.failure() : Result.success(result);
     }
 }

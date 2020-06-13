@@ -1,12 +1,16 @@
 package com.teamwork.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.teamwork.dao.TaskAttachmentDao;
 import com.teamwork.dao.TaskOpRecordDao;
 import com.teamwork.entity.T_TASK_ATTACHMENT;
 import com.teamwork.entity.T_TASK_OP_RECORD;
-import com.teamwork.service.CommonService;
 import com.teamwork.service.TaskOpRecordService;
+import com.teamwork.utils.GuidUtils;
+import com.teamwork.utils.SnowflakeIdWorker;
+import com.teamwork.utils.StringUtil;
 import com.teamwork.vo.TaskAttachmentVO;
 import com.teamwork.vo.TaskOpRecordVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +36,6 @@ public class TaskOpRecordServiceImpl implements TaskOpRecordService {
     private TaskOpRecordDao taskOpRecordDao;
     @Autowired
     private TaskAttachmentDao taskAttachmentDao;
-    @Autowired
-    private CommonService commonService;
     @Resource
     private SnowflakeIdWorker idWorker;
 
@@ -45,7 +47,7 @@ public class TaskOpRecordServiceImpl implements TaskOpRecordService {
         List<TaskOpRecordVO> list = new ArrayList<>();
 
         for (T_TASK_OP_RECORD t_task_op_record : entityList) {
-            TaskOpRecordVO vo = BeanUtil.copy(t_task_op_record, TaskOpRecordVO.class);
+            TaskOpRecordVO vo = BeanUtil.copyProperties(t_task_op_record, TaskOpRecordVO.class);
 
             //关联附件
             if(vo.getRecordType() == 98) {
@@ -55,7 +57,7 @@ public class TaskOpRecordServiceImpl implements TaskOpRecordService {
                     if(vo.getAttachmentList() == null) {
                         vo.setAttachmentList(new ArrayList<TaskAttachmentVO>());
                     }
-                    attachmentList.forEach((item) -> vo.getAttachmentList().add(BeanUtil.copy(item, TaskAttachmentVO.class)));
+                    attachmentList.forEach((item) -> vo.getAttachmentList().add(BeanUtil.copyProperties(item, TaskAttachmentVO.class)));
                 }
             }
 
@@ -66,18 +68,18 @@ public class TaskOpRecordServiceImpl implements TaskOpRecordService {
 
     @Override
     public boolean addRecord(TaskOpRecordVO record) {
-        if(StringUtil.isNullOrEmpty(record.getViewId()) || this.commonService.existViewId(record.getViewId()))
+        if(StringUtil.isNullOrEmpty(record.getViewId()))
             return false;
 
-        T_TASK_OP_RECORD entity = BeanUtil.copy(record, T_TASK_OP_RECORD.class);
+        T_TASK_OP_RECORD entity = BeanUtil.copyProperties(record, T_TASK_OP_RECORD.class);
         entity.setRecordId(idWorker.nextId());
-        entity.setCreateTime(DateUtil.getCurrentDate());
+        entity.setCreateTime(DateUtil.date());
 
         //如果动态是附件类型，则获取相关附件
         if(record.getRecordType() == 98) {
             List<TaskAttachmentVO> attachmentList = this.getTempAttachmentList(record.getTaskId());
             attachmentList.forEach((attachmentVO -> {
-                T_TASK_ATTACHMENT attachment = BeanUtil.copy(attachmentVO, T_TASK_ATTACHMENT.class);
+                T_TASK_ATTACHMENT attachment = BeanUtil.copyProperties(attachmentVO, T_TASK_ATTACHMENT.class);
                 attachment.setOpRecordId(entity.getRecordId());
                 int rows = this.taskAttachmentDao.insert(attachment);
                 //附件入库成功后，删除附件上传缓存记录
@@ -96,7 +98,7 @@ public class TaskOpRecordServiceImpl implements TaskOpRecordService {
 
     @Override
     public boolean addAttachment(TaskAttachmentVO attachment) {
-        T_TASK_ATTACHMENT entity = BeanUtil.copy(attachment, T_TASK_ATTACHMENT.class);
+        T_TASK_ATTACHMENT entity = BeanUtil.copyProperties(attachment, T_TASK_ATTACHMENT.class);
         int rows = this.taskAttachmentDao.insert(entity);
         return rows > 0;
     }

@@ -64,6 +64,13 @@ public class UserServiceImpl implements UserService {
         return Result.success(userInfo);
     }
 
+    @Override
+    public Result getUserInfo(long userId) {
+        T_USER entity = this.userDao.selectById(userId);
+        UserInfo user = BeanUtil.copyProperties(entity, UserInfo.class);
+        return user == null ? Result.failure() : Result.success(user);
+    }
+
     /**
      * 用户登录成功，生成token
      */

@@ -2,10 +2,10 @@ package com.teamwork.vo;
 
 import java.io.Serializable;
 
-public class Result implements Serializable {
+public class Result<T> implements Serializable {
     private int code;
     private String msg;
-    private Object data;
+    private T data;
 
     public int getCode() {
         return code;
@@ -23,7 +23,7 @@ public class Result implements Serializable {
         this.msg = msg;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
@@ -71,7 +71,7 @@ public class Result implements Serializable {
         this.msg = resultCode.message();
     }
 
-    private void setData(Object data) {
+    private void setData(T data) {
         this.data = data;
     }
 }

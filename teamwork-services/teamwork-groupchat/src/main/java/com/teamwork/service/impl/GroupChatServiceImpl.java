@@ -4,17 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.teamwork.consts.ExchangeName;
 import com.teamwork.consts.RedisKey;
 import com.teamwork.dao.GroupChatDao;
-import com.teamwork.dao.UserDao;
 import com.teamwork.entity.T_GROUPCHAT_MSG;
-import com.teamwork.entity.T_USER;
+import com.teamwork.feign.UserClientService;
 import com.teamwork.service.GroupChatService;
 import com.teamwork.utils.BeanUtil;
 import com.teamwork.utils.DateUtil;
 import com.teamwork.utils.JsonUtil;
 import com.teamwork.utils.RedisUtil;
 import com.teamwork.vo.ChatMessageVo;
+import com.teamwork.vo.GroupChatMsgFilterCondition;
+import com.teamwork.vo.Result;
 import com.teamwork.vo.UserInfo;
-import com.teamwork.vo.condition.GroupChatMsgFilterCondition;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class GroupChatServiceImpl implements GroupChatService {
     @Autowired
     private GroupChatDao groupChatDao;
     @Autowired
-    private UserDao userDao;
+    private UserClientService userClientService;
 
     /**
      * 统一接收客户端的群聊消息，存储至redis
@@ -98,7 +98,8 @@ public class GroupChatServiceImpl implements GroupChatService {
                     ChatMessageVo chatMessage = BeanUtil.copy(item, ChatMessageVo.class);
 
                     //region 设置消息发送者
-                    chatMessage.setUser(this.getUserInfo(item.getUserId()));
+                    Result userResult = userClientService.getUserInfo(item.getUserId());
+                    chatMessage.setUser((UserInfo) userResult.getData());
                     //endregion
 
                     messageList.add(chatMessage);
@@ -139,7 +140,6 @@ public class GroupChatServiceImpl implements GroupChatService {
             }
         } else {
             //从db读取，写入redis缓存
-//            List<T_GROUPCHAT_MSG> list = this.groupChatDao.getHistoryMessage2(condition);
             QueryWrapper<T_GROUPCHAT_MSG> wrapper = new QueryWrapper<>();
             wrapper.eq("project_id", condition.getProjectId());
             wrapper.between("msg_time", condition.getStartTime(), condition.getEndTime());
@@ -149,7 +149,8 @@ public class GroupChatServiceImpl implements GroupChatService {
                     ChatMessageVo chatMessage = BeanUtil.copy(item, ChatMessageVo.class);
 
                     //region 设置消息发送者
-                    chatMessage.setUser(this.getUserInfo(item.getUserId()));
+                    Result<UserInfo> userResult = userClientService.getUserInfo(item.getUserId());
+                    chatMessage.setUser(userResult.getData());
                     //endregion
 
                     messageList.add(chatMessage);
@@ -168,12 +169,5 @@ public class GroupChatServiceImpl implements GroupChatService {
         }
 
         return messageList;
-    }
-
-    private UserInfo getUserInfo(long userId) {
-        T_USER entity = this.userDao.selectById(userId);
-        UserInfo user = BeanUtil.copy(entity, UserInfo.class);
-
-        return user;
     }
 }

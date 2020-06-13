@@ -28,4 +28,15 @@ public class UserController {
         System.out.println("port:" + this.port);
         return userService.userLogin(vo, response);
     }
+
+    /**
+     * 生成页面id
+     */
+    @CrossOrigin(origins="*", maxAge=3600)
+    @ResponseBody
+    @GetMapping(value = "/user/info")
+    public Result getUserInfo(@RequestParam(value = "userId") long userId) {
+        System.out.println("port:" + this.port);
+        return userService.getUserInfo(userId);
+    }
 }
