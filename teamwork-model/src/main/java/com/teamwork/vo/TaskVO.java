@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TaskVO extends BaseVO {
+public class TaskVO extends BusinessVO {
     private long taskId;
     private String taskName;
     private String listId;

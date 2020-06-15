@@ -15,7 +15,8 @@ public enum ResultCode {
     USERNAME_NOT_FOUND(20003, "账号不存在"),
     PASSWORD_WRONG(20004, "密码错误"),
     USER_ACCOUNT_FORBIDDEN(20010, "账号已被禁用"),
-    TOKEN_EXPIRED(401, "Token已过期");
+    TOKEN_EXPIRED(401, "Token已过期"),
+    REPEAT_REQUEST(20020, "重复请求");
 
     private Integer code;
     private String message;

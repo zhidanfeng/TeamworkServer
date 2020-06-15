@@ -39,6 +39,24 @@ public class RedissonLockUtil {
         return lock;
     }
 
+    public static boolean tryLock(String lockKey, long leaseTime) {
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            return lock.tryLock(0, leaseTime, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
+
+    public static boolean tryLock(String lockKey, long leaseTime, TimeUnit unit) {
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            return lock.tryLock(0, leaseTime, unit);
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
+
     public static boolean tryLock(String lockKey, long waitTime, long leaseTime, TimeUnit unit) {
         RLock lock = redissonClient.getLock(lockKey);
         try {

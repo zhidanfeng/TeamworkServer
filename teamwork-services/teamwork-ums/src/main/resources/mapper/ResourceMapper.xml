@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.teamwork.dao.ResourceDao">
-    <select id="selectByPage" resultType="com.teamwork.entity.ResourceDO" parameterType="com.teamwork.entity.paging.PagingDO">
+    <select id="selectByPage" resultType="com.teamwork.entity.ResourceDO" parameterType="com.teamwork.entity.paging.PagingDO" flushCache="true">
         select resource_id, resource_name, resource_desc, category_id, gmt_created, gmt_modified
         from t_resource
         <where>

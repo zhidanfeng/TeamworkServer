@@ -21,6 +21,8 @@ public class PriorityDO {
     private int prioritySeq;
     @TableField(value = "priority_color")
     private String priorityColor;
+    @TableField(value = "default_flag")
+    private int defaultFlag;
     @TableField(value = "gmt_created")
     private Date gmtCreated;
     @TableField(value = "gmt_modified")

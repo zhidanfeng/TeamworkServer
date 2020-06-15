@@ -3,18 +3,18 @@ package com.teamwork.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.teamwork.dao.PersonalPlanDao;
+import com.teamwork.dao.PriorityDao;
 import com.teamwork.dao.RequirementDao;
 import com.teamwork.dao.TaskDao;
+import com.teamwork.entity.PriorityDO;
 import com.teamwork.entity.T_TASK;
 import com.teamwork.entity.T_TASK_PERSONALPLAN;
 import com.teamwork.entity.T_TASK_REQUIREMENT;
 import com.teamwork.service.TaskService;
 import com.teamwork.utils.*;
-import com.teamwork.vo.PersonalPlanVO;
-import com.teamwork.vo.RequirementVO;
-import com.teamwork.vo.Result;
-import com.teamwork.vo.TaskVO;
+import com.teamwork.vo.*;
 import com.teamwork.vo.condition.TaskFilterCondition;
+import org.redisson.api.RLock;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,23 +36,33 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private PersonalPlanDao personalPlanDao;
     @Autowired
+    private PriorityDao priorityDao;
+    @Autowired
     private RedisUtil redisUtil;
     @Autowired
     private AmqpTemplate amqpTemplate;
-//    @Autowired
-//    private TaskRepository taskRepository;
     @Autowired
     private SnowflakeIdWorker snowflakeIdWorker;
 
+    /**
+     * 需求管理任务-新增
+     */
     @Override
     @Transactional
     public Result addRequirement(RequirementVO vo) {
+
+        boolean isAccquired = RedissonLockUtil.tryLock(vo.getBusinessId(), 60);
+        if(!isAccquired)
+            return Result.failure(ResultCode.REPEAT_REQUEST);
+
         long taskId = this.InsertTaskRecord(vo);
 
         T_TASK_REQUIREMENT entity = new T_TASK_REQUIREMENT();
         BeanUtils.copyProperties(vo, entity);
         entity.setTaskId(taskId);
         this.requirementDao.insert(entity);
+
+        RedissonLockUtil.unlock(vo.getBusinessId());
 
         return Result.success(taskId);
     }
@@ -111,17 +121,15 @@ public class TaskServiceImpl implements TaskService {
         return list == null ? Result.failure() : Result.success(list);
     }
 
+    /**
+     * 个人计划任务-新增
+     */
     @Override
     public Result addPersonalPlan(PersonalPlanVO vo) {
 
-        //1、viewid为空则表示有可能是第三方直接发送的无效请求，需抛弃
-        //2、viewid不为空，则判断redis是否有该值，如果没有，则表示是第一次请求，缓存该viewid，并设置过期时间为2分钟
-        //2.1、如果redis中有这个viewid，则表示已经有过一次请求了，则不再请求
-        if(StringUtil.isNullOrEmpty(vo.getViewId())) {
-            System.out.println("相同请求，抛弃");
-            return Result.failure();
-        }
-        System.out.println("第一次处理");
+        boolean isAccquired = RedissonLockUtil.tryLock(vo.getBusinessId(), 60);
+        if(!isAccquired)
+            return Result.failure(ResultCode.REPEAT_REQUEST);
 
         long taskId = this.InsertTaskRecord(vo);
 
@@ -135,6 +143,8 @@ public class TaskServiceImpl implements TaskService {
 //        taskInfo.setId(taskId);
 //        taskInfo.setTaskName(vo.getTaskName());
 //        this.taskRepository.save(taskInfo);
+
+        RedissonLockUtil.unlock(vo.getBusinessId());
 
         return Result.success(taskId);
     }
@@ -176,6 +186,9 @@ public class TaskServiceImpl implements TaskService {
      *
      */
     private long InsertTaskRecord(TaskVO vo) {
+
+        PriorityDO priority = priorityDao.selectOne(new QueryWrapper<PriorityDO>().eq("default_flag", 1));
+
         T_TASK taskEntity = new T_TASK();
         taskEntity.setTaskId(this.snowflakeIdWorker.nextId());
         taskEntity.setTaskName(vo.getTaskName());
@@ -184,6 +197,9 @@ public class TaskServiceImpl implements TaskService {
         taskEntity.setParentTaskId(vo.getParentTaskId());
         taskEntity.setCreateTime(DateUtil.getCurrentDate());
         taskEntity.setUpdateTime(taskEntity.getCreateTime());
+
+        taskEntity.setPriorityId(priority.getPriorityId());
+
         taskDao.insert(taskEntity);
 
         return taskEntity.getTaskId();
