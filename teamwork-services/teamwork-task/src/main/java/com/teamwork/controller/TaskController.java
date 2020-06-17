@@ -1,5 +1,7 @@
 package com.teamwork.controller;
 
+import com.teamwork.annotation.RedisLock;
+import com.teamwork.annotation.RedisParam;
 import com.teamwork.service.TaskService;
 import com.teamwork.vo.PersonalPlanVO;
 import com.teamwork.vo.RequirementVO;
@@ -72,6 +74,7 @@ public class TaskController {
     @CrossOrigin(origins="*", maxAge=3600)
     @ResponseBody
     @PostMapping(value = "/task/personalplan/add")
+    @RedisLock(prefix = "task", expire = 5)
     public Result addPersonalPlan(@RequestBody PersonalPlanVO param) {
         return this.taskService.addPersonalPlan(param);
     }

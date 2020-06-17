@@ -127,9 +127,9 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Result addPersonalPlan(PersonalPlanVO vo) {
 
-        boolean isAccquired = RedissonLockUtil.tryLock(vo.getBusinessId(), 60);
-        if(!isAccquired)
-            return Result.failure(ResultCode.REPEAT_REQUEST);
+//        boolean isAccquired = RedissonLockUtil.tryLock(vo.getBusinessId(), 10);
+//        if(!isAccquired)
+//            return Result.failure(ResultCode.REPEAT_REQUEST);
 
         long taskId = this.InsertTaskRecord(vo);
 
@@ -144,7 +144,7 @@ public class TaskServiceImpl implements TaskService {
 //        taskInfo.setTaskName(vo.getTaskName());
 //        this.taskRepository.save(taskInfo);
 
-        RedissonLockUtil.unlock(vo.getBusinessId());
+        //RedissonLockUtil.unlock(vo.getBusinessId());
 
         return Result.success(taskId);
     }

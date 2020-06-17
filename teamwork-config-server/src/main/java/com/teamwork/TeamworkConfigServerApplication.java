@@ -11,5 +11,4 @@ public class TeamworkConfigServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(TeamworkConfigServerApplication.class, args);
     }
-
 }

@@ -8,7 +8,6 @@ public class TeamworkGatewayApiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(TeamworkGatewayApiApplication.class, args);
-        System.out.println("hehe");
     }
 
 }
