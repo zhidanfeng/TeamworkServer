@@ -47,18 +47,6 @@ public class T_TASK_REQUIREMENT {
     @Getter @Setter
     private String opinion;
     /**
-     * 需求提出时间
-     */
-    @TableField(value = "start_time", updateStrategy = FieldStrategy.IGNORED)
-    @Getter @Setter
-    private Date startTime;
-    /**
-     * 需求要求完成时间
-     */
-    @TableField(value = "end_time", updateStrategy = FieldStrategy.IGNORED)
-    @Getter @Setter
-    private Date endTime;
-    /**
      * 需求计划上线时间
      */
     @TableField(value = "plan_online_time", updateStrategy = FieldStrategy.IGNORED)

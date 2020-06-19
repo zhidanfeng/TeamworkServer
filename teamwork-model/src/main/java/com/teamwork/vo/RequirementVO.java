@@ -4,6 +4,8 @@ import com.teamwork.annotation.RedisParam;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 /**
  * 需求信息
  */
@@ -26,15 +28,6 @@ public class RequirementVO extends TaskVO {
      * 评估意见
      */
     private String opinion;
-    /**
-     * 需求提出时间
-     */
-    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    private long startTime;
-    /**
-     * 需求要求完成时间
-     */
-    private long endTime;
     /**
      * 需求计划上线时间
      */

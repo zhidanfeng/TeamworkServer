@@ -22,12 +22,6 @@ public class T_TASK_PERSONALPLAN {
     @Setter
     private long taskId;
     /**
-     * 截止时间
-     */
-    @TableField(value = "end_time", updateStrategy = FieldStrategy.IGNORED)
-    @Getter @Setter
-    private Date endTime;
-    /**
      * 重复类型
      */
     @TableField(value = "repeat_type", updateStrategy = FieldStrategy.IGNORED)

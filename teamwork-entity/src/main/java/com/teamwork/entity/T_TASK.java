@@ -1,9 +1,6 @@
 package com.teamwork.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,12 +42,30 @@ public class T_TASK {
      * 父任务id
      */
     @TableField(value = "parent_taskid")
-    private String parentTaskId;
+    private long parentTaskId;
     /**
      * 优先级
      */
     @TableField(value = "priority_id")
     private Long priorityId;
+    /**
+     * 记录创建时间
+     */
+    @TableField(value = "create_time")
     private Date createTime;
+    /**
+     * 记录修改时间
+     */
+    @TableField(value = "update_time")
     private Date updateTime;
+    /**
+     * 开始时间
+     */
+    @TableField(value = "start_time", updateStrategy = FieldStrategy.IGNORED)
+    private Date startTime;
+    /**
+     * 截止时间
+     */
+    @TableField(value = "end_time", updateStrategy = FieldStrategy.IGNORED)
+    private Date endTime;
 }

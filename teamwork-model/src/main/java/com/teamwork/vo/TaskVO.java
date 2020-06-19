@@ -3,6 +3,7 @@ package com.teamwork.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -16,7 +17,15 @@ public class TaskVO extends BusinessVO {
      * 优先级id
      */
     private Long priorityId;
-    private String parentTaskId;
+    private long parentTaskId;
     private List<TaskVO> subTaskList;
     private String viewId;
+    /**
+     * 任务开始时间
+     */
+    private Date startTime;
+    /**
+     * 任务截止时间
+     */
+    private Date endTime;
 }

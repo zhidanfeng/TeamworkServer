@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.teamwork.dao.TaskRemindRuleDao">
+    <select id="selectListByTaskId" resultMap="taskRemindRuleMap" parameterType="java.lang.String">
+        select t1.id, t1.task_id, t1.remind_field_type, t1.remind_time_length, t1.remind_time_unit
+          , t1.gmt_created, t1.gmt_modified, t2.id as memberid, t2.user_id, t2.remind_rule_id
+          , t2.gmt_created as member_gmt_created, t2.gmt_modified as member_gmt_modified
+        from task_remind_rule t1 left join task_remind_member t2
+        on t1.id = t2.remind_rule_id where t1.task_id = #{taskId}
+    </select>
+    
+    <resultMap id="taskRemindRuleMap" type="com.teamwork.vo.TaskRemindRuleVO">
+        <id column="id" property="ruleId" />
+        <result column="task_id" property="taskId" />
+        <result column="remind_field_type" property="remindFieldType" />
+        <result column="remind_time_length" property="remindTimeLength" />
+        <result column="remind_time_unit" property="remindTimeUnit" />
+        <result column="gmt_created" property="gmtCreated" />
+        <result column="gmt_modified" property="gmtModified" />
+        <collection property="memberList" ofType="com.teamwork.vo.TaskRemindMemberVO">
+            <id column="memberid" property="id" />
+            <result column="remind_rule_id" property="ruleId" />
+            <result column="user_id" property="userId" />
+            <result column="member_gmt_created" property="gmtCreated" />
+            <result column="member_gmt_modified" property="gmtModified" />
+        </collection>
+    </resultMap>
+</mapper>

@@ -6,7 +6,8 @@
     </select>
 
     <select id="getTaskListList" resultMap="taskListResultMap" parameterType="java.lang.String">
-        select t1.id, t1.group_id, t1.list_name, t1.seq, t1.can_delete, t2.id as taskId, t2.project_id, t2.task_name, t2.priority_id
+        select t1.id, t1.group_id, t1.list_name, t1.seq, t1.can_delete, t2.id as taskId, t2.project_id
+        , t2.task_name, t2.priority_id, t2.parent_taskid
         from t_task_list t1 left join t_task t2
         on t1.id = t2.list_id
         where t1.group_id = #{groupId}
@@ -23,6 +24,7 @@
             <result column="project_id" property="projectId" />
             <result column="task_name" property="taskName" />
             <result column="priority_id" property="priorityId" />
+            <result column="parent_taskid" property="parentTaskId" />
         </collection>
     </resultMap>
 </mapper>

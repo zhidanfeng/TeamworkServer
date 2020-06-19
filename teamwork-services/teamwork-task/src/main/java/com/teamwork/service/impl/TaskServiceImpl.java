@@ -1,5 +1,7 @@
 package com.teamwork.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.teamwork.dao.PersonalPlanDao;
@@ -11,7 +13,9 @@ import com.teamwork.entity.T_TASK;
 import com.teamwork.entity.T_TASK_PERSONALPLAN;
 import com.teamwork.entity.T_TASK_REQUIREMENT;
 import com.teamwork.service.TaskService;
-import com.teamwork.utils.*;
+import com.teamwork.utils.RedisUtil;
+import com.teamwork.utils.RedissonLockUtil;
+import com.teamwork.utils.SnowflakeIdWorker;
 import com.teamwork.vo.*;
 import com.teamwork.vo.condition.TaskFilterCondition;
 import org.redisson.api.RLock;
@@ -21,10 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -74,16 +75,14 @@ public class TaskServiceImpl implements TaskService {
         UpdateWrapper<T_TASK> updateWrapper = new UpdateWrapper<>();
         updateWrapper.set("task_name", vo.getTaskName());
         updateWrapper.set("list_id", vo.getListId());
-        updateWrapper.set("update_time", DateUtil.getCurrentDate());
+        updateWrapper.set("update_time", DateUtil.date());
         updateWrapper.eq("id", vo.getTaskId());
         taskDao.update(taskEntity, updateWrapper);
 
         T_TASK_REQUIREMENT entity = new T_TASK_REQUIREMENT();
         BeanUtils.copyProperties(vo, entity);
         entity.setTaskId(vo.getTaskId());
-        entity.setStartTime(DateUtil.convertTimestampToDate(vo.getStartTime()));
-        entity.setEndTime(DateUtil.convertTimestampToDate(vo.getEndTime()));
-        entity.setPlanOnlineTime(DateUtil.convertTimestampToDate(vo.getPlanOnlineTime()));
+        entity.setPlanOnlineTime(new Date(vo.getPlanOnlineTime()));
         int rows = this.requirementDao.updateById(entity);
 
         return rows > 0;
@@ -97,9 +96,7 @@ public class TaskServiceImpl implements TaskService {
         BeanUtils.copyProperties(task, vo);
         T_TASK_REQUIREMENT entity = this.requirementDao.selectById(taskId);
         BeanUtils.copyProperties(entity, vo);
-        vo.setStartTime(DateUtil.convertDateToTimestamp(entity.getStartTime()));
-        vo.setEndTime(DateUtil.convertDateToTimestamp(entity.getEndTime()));
-        vo.setPlanOnlineTime(DateUtil.convertDateToTimestamp(entity.getPlanOnlineTime()));
+        vo.setPlanOnlineTime(entity.getPlanOnlineTime().getTime());
 
         if(redisUtil.isConnected()) {
             Map<Object, Object> map = this.redisUtil.hget("task::" + taskId);
@@ -156,11 +153,10 @@ public class TaskServiceImpl implements TaskService {
         BeanUtils.copyProperties(task, vo);
         T_TASK_PERSONALPLAN entity = this.personalPlanDao.selectById(taskId);
         BeanUtils.copyProperties(entity, vo);
-        vo.setEndTime(DateUtil.convertDateToTimestamp(entity.getEndTime()));
 
         List<T_TASK> subTaskList = this.taskDao.selectList(new QueryWrapper<T_TASK>().eq("parent_taskid", task.getTaskId()));
         final List<TaskVO> subList = new ArrayList<>();
-        subTaskList.forEach((t) -> subList.add(BeanUtil.copy(t, TaskVO.class)));
+        subTaskList.forEach((t) -> subList.add(BeanUtil.copyProperties(t, TaskVO.class)));
         vo.setSubTaskList(subList);
 
         return vo;
@@ -173,7 +169,6 @@ public class TaskServiceImpl implements TaskService {
         T_TASK_PERSONALPLAN entity = new T_TASK_PERSONALPLAN();
         BeanUtils.copyProperties(vo, entity);
         entity.setTaskId(vo.getTaskId());
-        entity.setEndTime(DateUtil.convertTimestampToDate(vo.getEndTime()));
         int rows = this.personalPlanDao.updateById(entity);
 
         //this.mqProducer.sendDataToQueue("test_queue_key", vo);
@@ -190,14 +185,8 @@ public class TaskServiceImpl implements TaskService {
         PriorityDO priority = priorityDao.selectOne(new QueryWrapper<PriorityDO>().eq("default_flag", 1));
 
         T_TASK taskEntity = new T_TASK();
+        taskEntity = BeanUtil.copyProperties(vo, T_TASK.class);
         taskEntity.setTaskId(this.snowflakeIdWorker.nextId());
-        taskEntity.setTaskName(vo.getTaskName());
-        taskEntity.setListId(vo.getListId());
-        taskEntity.setProjectId(vo.getProjectId());
-        taskEntity.setParentTaskId(vo.getParentTaskId());
-        taskEntity.setCreateTime(DateUtil.getCurrentDate());
-        taskEntity.setUpdateTime(taskEntity.getCreateTime());
-
         taskEntity.setPriorityId(priority.getPriorityId());
 
         taskDao.insert(taskEntity);
@@ -210,7 +199,7 @@ public class TaskServiceImpl implements TaskService {
 
         UpdateWrapper<T_TASK> updateWrapper = new UpdateWrapper<>();
         BeanUtils.copyProperties(vo, taskEntity);
-        updateWrapper.set("update_time", DateUtil.getCurrentDate());
+        updateWrapper.set("update_time", DateUtil.date());
         updateWrapper.eq("id", vo.getTaskId());
 
         taskDao.update(taskEntity, updateWrapper);

@@ -8,10 +8,6 @@ import lombok.Setter;
 @Setter
 public class PersonalPlanVO extends TaskVO {
     /**
-     * 截止时间
-     */
-    private long endTime;
-    /**
      * 重复类型
      */
     private int repeatType;
